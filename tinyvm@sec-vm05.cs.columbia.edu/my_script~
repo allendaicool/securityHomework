@@ -1,0 +1,32 @@
+
+
+
+#IFS=
+while  read -r line;do
+	# echo $(printf "%s" "$line")
+	fields=($line)
+	
+        tlen=${#fields[@]}
+        #echo ${tlen}
+	#echo  "${fields[0]}"  # ${fields[0]} is field 2
+	#echo  "${fields[${tlen}-1]}"
+		
+	for ((i=1; i < ${tlen}; i++));
+	do
+		if grep -q -w "${fields[i]}"  /etc/group;then
+		  	echo group  already exists
+		else
+			groupadd "${fields[i]}"
+		fi
+	done
+	
+	useradd -g "${fields[1]}" "${fields[0]}"
+	 
+	for ((i=2; i < ${tlen}; i++));
+        do
+		echo ${fields[i]}     ${fields[0]}
+                usermod -G "${fields[i]}" "${fields[0]}"
+        done
+ 
+done < tt
+  

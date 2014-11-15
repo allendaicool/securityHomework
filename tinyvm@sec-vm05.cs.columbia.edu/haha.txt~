@@ -1,0 +1,30 @@
+In this lesson, we will explore a powerful feature used by many command line programs called input/output redirection. As we have seen, many commands such as ls print their output on the display. This does not have to be the case, however. By using some special notation we can redirect the output of many commands to files, devices, and even to the input of other commands.
+
+
+
+Computer Glossary
+Who is Who
+C library function - strtok()
+Advertisements
+
+ 
+Previous Page Next Page
+Description
+The C library function char *strtok(char *str, const char *delim) breaks string str into a series of tokens using the delimitrer delim.
+
+Declaration
+Following is the declaration for strtok() function.
+
+char *strtok(char *str, const char *delim)
+Parameters
+str -- The contents of this string are modified and broken into smaller strings (tokens).
+
+delim -- This is the C string containing the delimiters. These may vary from one call to another.
+
+Return Value
+This function returns a pointer to the last token found in string. A null pointer is returned if there are no tokens left to retrieve.
+
+Example
+The following example shows the usage of strtok() function.
+
+#

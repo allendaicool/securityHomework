@@ -1,0 +1,13 @@
+my source files include: help.cpp function.cpp objget.cpp objtestacl.cpp objgetacl.cpp, objlist.cpp objsetacl.cpp
+and header file include: help.h fucntion.h objget.h objtestacl.h   objgetacl.h, objlist.h objsetacl.h
+
+	The filename format for certain file is user+filename. The ACl format is user+filename+ACL. and the user & group association file is named as user+group
+	
+	my test file used to do the objput commands is haha. and my ACL test file is named as newacl
+
+	the default user&group association file is userfile.txt
+
+	Each function first does a sanity check on the user input, searching for invalid characters such as "+", and examine if a certain argument appear on the uesr input. For example, if -u u1 does not appear on the user input, then we report an error. Also, if an argument is not supposed to appear on the user input. For example, -a is not supposed to show up for the ./objget. And my program also checks for if a certain argument follows option. u1 must follow the -u.
+	
+	Secondly, function checks for certain permission to perform certain task.
+

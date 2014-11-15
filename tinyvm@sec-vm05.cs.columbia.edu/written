@@ -1,0 +1,8 @@
+written part
+
+The design for programming part I came up with is the setuid. 
+The executable files are compiled by the root user and thus are owned by the root user. In the makefile script, the chmod command is executed to change the ownership of executable file to a seperate user which is different from any other user trying to access the file system. I created this seperate user to be named god and this special user owns a file system folder from which other users can retrieve the file which they have right access to. the mode for this folder is set to be 700, which means normal users can not access the file system simply by doing cd command. unauthorized users are bound to be blocked.
+
+Also, the command chmod 4711 [executable file] is called to ensure that whoever is running the executable possess the full priviledge of the executable file. In that case, a user attempting to access the filesystem is able to go inside the file system. 
+
+Inside the system, program will be checking if the user who get inside have the permission to do certain opertaion based on the ACl file

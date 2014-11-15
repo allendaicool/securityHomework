@@ -1,0 +1,30 @@
+my source files include: help.cpp function.cpp objget.cpp objtestacl.cpp objgetacl.cpp, objlist.cpp objsetacl.cpp
+and header file include: help.h fucntion.h objget.h objtestacl.h   objgetacl.h, objlist.h objsetacl.h
+
+The design I came up for programming part  is the setuid.
+The executable files are compiled by the root user and thus are owned by the root user.
+However, in the makefile script, I created a seperate user named god in the makefile script and uses its UID for the program.
+ the chmod command is executed to change the ownership of executable file to a seperate user
+ which is different from any other user trying to access the file system.
+ I created this seperate user to be named god and
+ this special user owns a filesystem folder from which other users can retrieve the file which they have right access to.
+ the mode for this folder is set to be 700, which means normal users can not access the file system simply by doing cd command. unauthorized users are bound to be blocked.
+
+Also, the command chmod 4711 [executable file] is called to ensure that
+ whoever is running the executable possess the full priviledge of the executable file.
+ In that case, a user attempting to access the filesystem is able to go inside the file system.
+
+Inside the system, program will be checking if the user who get inside have the permission to do certain opertaion based on the ACl file.
+
+
+
+
+
+The reason I choose a seperate user is that using the least priviledge principle can reduce the possible risk caused by setuid program. Imagine,if we setuid to root, anyone executing the program will possess the priviledge of root user, which can possibily lead to system-wide damage. But if we setuid to a seperate user,
+then the possible attack can only be launched against our filesystem that storing the objects and leaves the other part of system undamaged.
+
+
+username: tinyvm
+my passwd is waterRUNNER23
+
+
