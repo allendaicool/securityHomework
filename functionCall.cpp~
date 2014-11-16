@@ -44,8 +44,11 @@ using namespace std;
 
 void handleErrors(void)
 {
+
+	cout<<"gegdsafdsakjflkds"<<endl;
+
   ERR_print_errors_fp(stderr);
-  abort();
+  //abort();
 }
 
 int lengthCheck(const char *input)
@@ -515,6 +518,8 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 
   int plaintext_len;
 
+
+
   /* Create and initialise the context */
   if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
 
@@ -526,19 +531,21 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv))
     handleErrors();
 
+	cout<<"gethere "<<endl;
   /* Provide the message to be decrypted, and obtain the plaintext output.
    * EVP_DecryptUpdate can be called multiple times if necessary
    */
   if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
     handleErrors();
   plaintext_len = len;
-
+cout<<"gethere B"<<endl;
   /* Finalise the decryption. Further plaintext bytes may be written at
    * this stage.
    */
   if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) handleErrors();
   plaintext_len += len;
 
+cout<<"gethere C"<<endl;
   /* Clean up */
   EVP_CIPHER_CTX_free(ctx);
 

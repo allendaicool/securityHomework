@@ -44,8 +44,11 @@ using namespace std;
 
 void handleErrors(void)
 {
+
+	cout<<"invalid password"<<endl;
+
   ERR_print_errors_fp(stderr);
-  abort();
+  //abort();
 }
 
 int lengthCheck(const char *input)
@@ -515,6 +518,8 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 
   int plaintext_len;
 
+
+
   /* Create and initialise the context */
   if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
 
@@ -532,7 +537,6 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
     handleErrors();
   plaintext_len = len;
-
   /* Finalise the decryption. Further plaintext bytes may be written at
    * this stage.
    */
