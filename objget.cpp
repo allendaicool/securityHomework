@@ -54,7 +54,7 @@ int main(int argc, const char * argv[])
 		
 	int kflag = 0;  string passwd("");
 	parseCommand(argc,argv,aFlag,lFlag,operation,kflag,passwd);
-	if(aFlag == 1 || lFlag == 1 || argc != 2 || kflag == 1){
+	if(aFlag == 1 || lFlag == 1 || argc != 4 || kflag != 1){
 		fprintf(stderr, "invalid argument input");
 		exit(EXIT_FAILURE);
 	}
@@ -80,18 +80,21 @@ int main(int argc, const char * argv[])
 	 * for example user+doc1 as name for doc file for user*/
 	
 	containBit = checkIfContainPlus((char *)argv[argc-1]);
-	
+	//string file_dec_name ("");	
 	string fileName("");
 	if (containBit){
 		if (sanityCheck((char *)argv[argc-1],1) == 0){
 			fprintf(stderr,"invalid filename argument");
 			exit(EXIT_FAILURE);	
 		}	
+	//	file_dec_name.append(argv[argc-1]);
 		fileName.append(argv[argc-1]);
 		fileName.append("+ACL");
 	}
 	else{
 		fileName.append(usr);
+
+
 		if(sanityCheck((char *)argv[argc-1],0) == 0){
 			fprintf(stderr,"invalid filename argument");
 			exit(EXIT_FAILURE);	
@@ -117,33 +120,126 @@ int main(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 	
+
 	readPermission = checkPermission('r',val);
 	free(val);
+
+
 	/* if we have permssion, then we display the file content in stdout*/
 	if(readPermission == 1){
+
 		string fileNameRelative("");
+
 		fileNameRelative.append("filesystem/");
+
 		if (containBit)
+
 			fileNameRelative.append(argv[argc-1]);	
+
 		else
+
 			fileNameRelative.append(fileName);
 
-		filestream = fopen(fileNameRelative.c_str(),"r");
-		if(filestream == NULL){
-			fprintf(stderr,"no suc file\n");
-			exit(EXIT_FAILURE);
-		}
-		char *buffer = NULL;;
-		size_t dum;
-		int revalue;
-		cout<<"\n";
-		while((revalue = (int)getline(&buffer,&dum,filestream))!= -1)
-		{
-			cout<<buffer;
-		}
-		if(buffer)
-			free(buffer);
-		fclose(filestream);
+		
+
+		unsigned char *fake_digest = MD5Sequence(passwd);
+
+
+		cout<<"fake_digest length is " << strlen((const char *)fake_digest)<<endl;
+
+
+		string viDec(fileNameRelative);
+		viDec.append("+v2");
+		int iv2_length=0;
+		unsigned char * iv2_enc = read_enc_key_iv_file (viDec,iv2_length); 
+		
+		string viDec1(fileNameRelative);
+		viDec1.append("+v1");
+		int iv1_length=0;
+		unsigned char * iv1_enc = read_enc_key_iv_file (viDec1,iv1_length); 
+	
+		//cout<<" -----------------printde here is  " << iv2_length <<endl;
+		//cout<<"iv2_enc length is " << strlen((const char *)iv2_enc )<<endl;
+
+		string passwd_enc(fileNameRelative);
+		passwd_enc.append("+key");
+		int passwd_enc_length = 0;
+		unsigned char *key_enc_file = read_enc_key_iv_file (passwd_enc ,passwd_enc_length); 
+		cout<<"key_enc_file length is " << strlen((const char *)key_enc_file )<<endl;
+		cout<<" -----------------printde here is  " << passwd_enc_length <<endl;
+	
+
+		unsigned char *real_key = (unsigned char *)malloc(33);
+		memset(real_key,0,33);
+	
+      		int encrypt_len = decrypt(key_enc_file, passwd_enc_length, fake_digest, iv2_enc,real_key);
+		real_key  = (unsigned char *)realloc(real_key,encrypt_len+1);
+		real_key [encrypt_len] = '\0';
+		cout<<"-----------------------fake key      is aaaaaaaaaaaaaaaaaa!!!!!!!"<<endl;
+		hex_print(real_key, 16);
+//		cout<<"the real value key is aaaaaaaaaaaaaaaa!!!!!!!!!"<<endl;
+//		hex_print(aes_Key, 16);
+
+
+		//if(compare_key_fakeKey(real_key,aes_Key,16))
+		//	cout<<"they match-------------------"<<endl;
+	//cout<<"the encrypt len is "<<encrypt_len<<endl;
+
+
+
+	FILE * pFile;
+ 	long lSize;
+  	char * buffer;
+  	size_t result;
+
+  	pFile = fopen (fileNameRelative.c_str(), "rb" );
+ 	if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+
+  	// obtain file size:
+  	fseek (pFile , 0 , SEEK_END);
+  	lSize = ftell (pFile);
+  	rewind (pFile);
+	//cout<<"the size of file is   " << lSize<<endl;
+	
+  	// allocate memory to contain the whole file:
+	 buffer = (char*) malloc (sizeof(char)*lSize+1);
+	//cout<<"it is ok here B"<<endl;
+	 memset(buffer,0,sizeof(char)*lSize+1);
+  	if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
+
+  	// copy the file into the buffer:
+  	result = fread (buffer,1,lSize,pFile);
+  	if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
+
+  /* the whole file is now loaded in the memory buffer. */
+
+  // terminate
+ 	 fclose (pFile);
+
+
+
+	cout<<"the result is so large ----------------------->" << result<<endl;
+	unsigned char *plaintext2 = (unsigned char*)malloc(sizeof(char)*result+1);
+	memset(plaintext2,0,sizeof(char)*result+1);
+	
+//aes_Key
+
+	
+	int decslength = decrypt((unsigned char *)buffer,result, real_key,
+ 	iv1_enc, plaintext2);
+	
+	cout<<"decryption leng is " << decslength<<endl;
+	cout<<"the real decryption length is " << strlen((const char *)plaintext2)<<endl;
+	plaintext2 = (unsigned char*)realloc(plaintext2,decslength+1);
+	plaintext2[decslength] = '\0';
+	
+	for ( int i = 0 ; i < decslength ; i++)
+		cout<<plaintext2[i];
+	
+	
+	//printf("our text file is %s \n", plaintext2);
+	//cout<<"the real decryption length for now is " << strlen((const char *)plaintext2)<<endl;
+
 		cout<<"\n";
 	}
 	else{

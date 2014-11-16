@@ -24,6 +24,59 @@
 
 using namespace std;
 
+bool compare_key_fakeKey(unsigned char * key, unsigned char *fake_key, int len)
+{
+	for (int i = 0; i < len ; i++){
+		if(key[i]!=fake_key[i])
+			return false;
+	}
+	return true;
+
+}
+
+
+unsigned char * read_enc_key_iv_file (string passin, int & length) 
+{
+	int v2_file_size = size_of_file (passin);
+	FILE * v2_file;
+	v2_file = fopen(passin.c_str(),"rb");
+	if (v2_file==NULL) {fputs ("File error",stderr); exit (1);}
+	unsigned char *v2_enc_buffer = (unsigned char *) malloc (sizeof(char)*v2_file_size+1);
+	memset(v2_enc_buffer,0,sizeof(char)*v2_file_size+1);
+
+	int byte_read = fread (v2_enc_buffer,1,v2_file_size,v2_file);
+
+	if (v2_file_size != byte_read) {fputs ("Reading error",stderr); exit (3);}
+
+//	cout << "read in size is----------------------------> "<<	byte_read << endl;
+	length = byte_read;
+	fclose(v2_file);	
+	return v2_enc_buffer;
+}
+
+unsigned char * MD5Sequence(string input) {
+ 
+	cout<<"the string being MD5ed is   "<<input<<endl;
+        unsigned char *data = (unsigned char *)input.c_str();
+        unsigned char *digest = (unsigned char *)malloc(17);
+	memset(digest,0,17);
+        int i;
+        char tmp[3]={'\0'};
+	char *buf= (char *)malloc(sizeof(char)*33);
+	buf[32] = '\0';
+        MD5(data,strlen((const char *)data),digest);
+        for (i = 0; i < 16; i++){
+                snprintf(tmp,3,"%2.2x",digest[i]);
+                strcat(buf,tmp);
+        }
+        
+	//printf("--------------------------->hashed value is %s\n",buf);
+	//printf("<-------------------------------------------ending\n");        
+	cout<<" --------->hashed length MD5 is -------------------->"<<	strlen((const char *)digest)<<endl;
+	hex_print(digest, strlen((const char *)digest));
+	return digest;
+}
+
  void hex_print(const void* pv, size_t len)
 {
     const unsigned char * p = (const unsigned char*)pv;

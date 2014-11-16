@@ -19,6 +19,9 @@
 
 
 using namespace std;
+bool compare_key_fakeKey(unsigned char * , unsigned char *, int );
+unsigned char * read_enc_key_iv_file (string, int & ) ;
+unsigned char * MD5Sequence(string);
 int getUser_Group(string &, vector<string> &);
 int parseCommand(int, const char ** ,
 		 int &,
