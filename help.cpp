@@ -86,16 +86,7 @@ int main(int argc, const char * argv[])
 
 
 	unsigned char * MD5digest = MD5Sequence(password);
-	
-
-
-
-
-
-
-       
-
-	
+		
 	/* check if user and group combination exists in user+group file*/
 	for(int i = 0 ; i < (int)group.size(); i++){	
 		if(checkifUserGroup((char *)usr.c_str(), (char *)(group.at(i).c_str()),0) == 1){
@@ -127,7 +118,7 @@ int main(int argc, const char * argv[])
 			fprintf(stderr,"invalid filename argument");
 			exit(EXIT_FAILURE);	
 		}
-		string fileNameExist("filesystem/");
+		string fileNameExist("/home/encryption/filesystem/");
 		fileNameExist.append(argv[argc-1]);
 		FILE  *openFIleTry;
 		openFIleTry = fopen(fileNameExist.c_str(),"r");
@@ -150,13 +141,13 @@ int main(int argc, const char * argv[])
 
 	storeVal = NULL;
 	string relativePath("");
-	relativePath.append("filesystem/");
+	relativePath.append("/home/encryption/filesystem/");
 	relativePath.append(fileName);
 	
 	filestream = fopen(relativePath.c_str(),"r");
 	if(filestream != NULL){
 		overWrite = 1;
-		fileNameACL.append("filesystem/");
+		fileNameACL.append("/home/encryption/filesystem/");
 		fileNameACL.append(fileName);
 		
 		addPathName(fileNameACL,NULL,0,1,0);
@@ -182,50 +173,49 @@ int main(int argc, const char * argv[])
 	}
 
 
-
-	
-//	newFile.open(relativePath.c_str());
-//	string bufferLine;
 	
 	/* read file contents from the input file into the usr file
 	 */
 	unsigned char * iv_enc =  (unsigned char *) malloc(AES_BLOCK_SIZE+1);
 	unsigned char * iv_dec = (unsigned char *) malloc(AES_BLOCK_SIZE+1);
  	unsigned char *aes_Key = (unsigned char *) malloc(AES_BLOCK_SIZE+1);
+	
 	memset(aes_Key, 0, AES_BLOCK_SIZE+1);
 	memset(iv_enc,0,AES_BLOCK_SIZE+1);
 	memset(iv_dec,0,AES_BLOCK_SIZE+1);
+
+	/*randomly generate aes_key and iv_enc*/
 	rand_gen(aes_Key);
 	rand_gen(iv_enc);
+
+	cout <<"the IV1 for objput  is  the following ---------------------------------->"<<endl;
+	hex_print(iv_enc,16);
+	cout <<"the IV1 for objput  is  the above ---------------------------------->"<<endl;
 	memcpy(iv_dec, iv_enc, AES_BLOCK_SIZE);
-	//cout<<"iv_dec lenght is  " << strlen((const char *)iv_dec)<<endl;
+
 	size_t cipher_length = 0;
 
-
-	//string relativePath("");
-	//relativePath.append("testcase");
 	int  plaintext_len = 0;
-	
+
+	/* first write the stdin input into the file and
+	obtain the file size. Then we write the ciphertext into file based on its file size*/	
 	unsigned char *plaintext = write_Into_file_and_out(relativePath, plaintext_len);
 
-	//printf("the string length is %d  string is %s \n", plaintext_len,plaintext );
-
-	//cout<<"plaintext_len%AES_BLOCK_SIZE == 0 is " << plaintext_len%AES_BLOCK_SIZE <<endl;
-	//(plaintext_len%AES_BLOCK_SIZE == 0)?plaintext_len:
 	int encslength = ((plaintext_len + AES_BLOCK_SIZE) /AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
-	//cout<<"plaintext length is "<< 	plaintext_len<<endl;
-	//cout<<"our encslength is "<< encslength<<endl;
-	unsigned char ciphertext[encslength];
+	
+	
+	unsigned char *ciphertext = (unsigned char *)malloc(encslength+1);
+	memset(ciphertext,0,encslength+1);
+	
 
-	//unsigned char * enc_out =  AesEncryption(aes_Key, iv_enc, iv_dec,cipher_length);
    	cipher_length = encrypt(plaintext,plaintext_len, aes_Key,iv_enc,ciphertext);
-	//cout<<"	cipher_length is " << cipher_length<<endl;
+
 
 	write_Into_file_cipher(relativePath,ciphertext, cipher_length);
-	//cout<<"ok here"<<endl;
-	//hex_print(ciphertext, cipher_length);
 
 
+
+	free(ciphertext);
 	/* creates a new aclFile for the created file
 	 */
 	
@@ -234,7 +224,7 @@ int main(int argc, const char * argv[])
 			fprintf(stderr, "wrong filename input\n");
 			exit(EXIT_FAILURE);
 		}
-		string aclListName("filesystem/");
+		string aclListName("/home/encryption/filesystem/");
 		aclListName.append(fileName);
 		addPathName(aclListName,NULL,0,1,0);	
 		aclList = fopen(aclListName.c_str(),"w+");
@@ -250,7 +240,14 @@ int main(int argc, const char * argv[])
 
 	store_encryptedkey_iv_iv(MD5digest,iv_dec ,aes_Key , relativePath);
 
+	
+	cout <<"the aes_key is the following ----------------->"<<endl;
+	hex_print(aes_Key, 16);
+	cout <<"the aes_key is the above ----------------->"<<endl;
 	cout <<"successful"<<endl;
+	free(iv_enc);
+	free(iv_dec);
+	free(aes_Key);
 	return 0;
 }
 
@@ -258,9 +255,9 @@ int main(int argc, const char * argv[])
 
 
 
-
-
-
+/* this method is used to store the key, iv1 and iv2 into the file
+ * create u1+doc+key  u1+doc+v1  u1+doc+v2
+*/
 void store_encryptedkey_iv_iv(unsigned char *MD5digest, unsigned char *iv_dec, unsigned char *aes_Key, string relativePath)
 {
 
@@ -270,7 +267,7 @@ void store_encryptedkey_iv_iv(unsigned char *MD5digest, unsigned char *iv_dec, u
 	v1_path.append("+v1");
 	string v2_path(relativePath);
 	v2_path.append("+v2");
-//	cout<<"AES_BLOCK_SIZE is " << AES_BLOCK_SIZE<<endl; 
+
 	unsigned char *iv = (unsigned char *)malloc(AES_BLOCK_SIZE+1);
 	unsigned char *iv_2 = (unsigned char *)malloc(AES_BLOCK_SIZE+1);
 	memset(iv,0,AES_BLOCK_SIZE+1);	
@@ -282,36 +279,35 @@ void store_encryptedkey_iv_iv(unsigned char *MD5digest, unsigned char *iv_dec, u
 	memset(encypted_key,0,encrypted_key_length+1);
 
         int encrypt_length = encrypt_random_key(iv,iv_2, MD5digest, aes_Key,encypted_key);
-	
 
-//	cout<<"encrypt_length is " << encrypt_length <<endl;
-//	cout<<"-----------------string length is   " << strlen((const char*)iv_2)<<endl;
+	hex_print(iv_2, 16);
+
 	FILE *keyList;
 	keyList = fopen(Key_path.c_str(),"w+");
 	if (keyList == NULL)
 		exit(EXIT_FAILURE);
-	fputs((const char *)encypted_key,keyList);
-	//hex_print(encypted_key, encrypt_length);
+
+
+	fwrite(encypted_key,1,encrypted_key_length,keyList);
+
+
 	fclose(keyList);
 	
 	FILE *v1List;
 	v1List = fopen(v1_path.c_str(),"w+");
 	if(keyList == NULL)
 		exit(EXIT_FAILURE);
-	fputs((const char *)iv_dec, v1List);
-	cout<<"iv_dec begining-------------------------------"<<endl;
 
+	fwrite(iv_dec,1,16,v1List);
 
-	//hex_print(iv_dec, 16);
-	cout<<"iv_dec ending-------------------------------"<<endl;
 	fclose(v1List);
 
 	FILE *v2List;
 	v2List = fopen(v2_path.c_str(),"w+");
 	if(keyList == NULL)
 		exit(EXIT_FAILURE);
-	fputs((const char *)iv_2, v2List);
-	//hex_print(iv_2, 16);
+
+	fwrite(iv_2,1,16,v2List);
 	fclose(v2List);
 
 	free(iv);free(iv_2);free(encypted_key);

@@ -80,7 +80,7 @@ int main(int argc, const char * argv[])
 	}*/
 
 
-	string temp("filesystem/");
+	string temp("/home/encryption/filesystem/");
 
 
 	containBit = checkIfContainPlus((char *)argv[argc-1]);

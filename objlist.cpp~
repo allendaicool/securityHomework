@@ -78,7 +78,7 @@ int main(int argc, const char * argv[])
 	 * belonged to the user.
 	 */
 
-	if(chdir("filesystem/") == -1){
+	if(chdir("/home/encryption/filesystem/") == -1){
 		fprintf(stderr,"chdir() error");
                 exit(EXIT_FAILURE);
 

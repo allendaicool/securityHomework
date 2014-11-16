@@ -41,8 +41,8 @@ unsigned char * read_enc_key_iv_file (string passin, int & length)
 	FILE * v2_file;
 	v2_file = fopen(passin.c_str(),"rb");
 	if (v2_file==NULL) {fputs ("File error",stderr); exit (1);}
-	unsigned char *v2_enc_buffer = (unsigned char *) malloc (sizeof(char)*v2_file_size+1);
-	memset(v2_enc_buffer,0,sizeof(char)*v2_file_size+1);
+	unsigned char *v2_enc_buffer = (unsigned char *) malloc (v2_file_size+1);
+	memset(v2_enc_buffer,0,v2_file_size+1);
 
 	int byte_read = fread (v2_enc_buffer,1,v2_file_size,v2_file);
 
@@ -617,7 +617,7 @@ void write_Into_file_cipher(string &relativePath, unsigned char *ciphertext, int
 	return;
 }
 
-
+/*write into the file and return its size */
 unsigned char * write_Into_file_and_out (string &relativePath,int & size_file)
 {
 	writeIntoFile(relativePath);
@@ -651,6 +651,8 @@ int size_of_file (string & relativePath)
 	size = (int)st.st_size;
 	return size;
 }
+
+/*write into the file the text from the stdin input*/ 
 int writeIntoFile(string &relativePath)
 {
 	string bufferLine;

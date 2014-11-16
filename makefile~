@@ -57,10 +57,15 @@ exec:	build
 	-chmod u+s  ./objsetacl
 	-chown god ./objtestacl
 	-chmod 711 ./objtestacl
-	-chmod u+s  ./objtestacl	
-	-mkdir filesystem
-	-chown god filesystem
-	-chmod 700 filesystem	
+	-chmod u+s  ./objtestacl
+	-chown god  ./
+	-chmod 755  ./	
+	-mkdir  /home/encryption
+	-mkdir  /home/encryption/filesystem
+	-chown god /home/encryption/
+	-chmod 755 /home/encryption/	
+	-chown god /home/encryption/filesystem
+	-chmod 700 /home/encryption/filesystem	
 
 
 
@@ -81,12 +86,12 @@ test: 	build exec
 	-su u1 -c "./objgetacl u2+doc"
 	-su u1 -c "./objget u2+doc"
 	-su u1 -c "./objsetacl u2+doc < setu2ACL"
-	-su u1 -c "cat filesystem/u1+doc"
-	-su u1 -c  "cat filesystem/u1+doc+ACL"
-	-su u1 -c "cd filesystem"
-	-su u1 -c "ls -l filesystem/u1+doc"
+	-su u1 -c "cat /home/encryption/filesystem/u1+doc"
+	-su u1 -c  "cat /home/encryption/filesystem/u1+doc+ACL"
+	-su u1 -c "cd /home/encryption/filesystem"
+	-su u1 -c "ls -l /home/encryption/filesystem/u1+doc"
 clean:
 	-rm  -f  *.o   objtestacl objgetacl objsetacl objlist objput objget
 	-rm -f *.core
-	-rm -rf filesystem/
+	-rm -rf /home/encryption/filesystem/
 	

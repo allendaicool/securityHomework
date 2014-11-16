@@ -110,7 +110,7 @@ int main(int argc, const char * argv[])
 	val = NULL;
 
 	string relativePath("");
-	relativePath.append("filesystem/");
+	relativePath.append("/home/encryption/filesystem/");
 	relativePath.append(fileNameACL);
 	/* find if we have permission to display the file*/
 	findPermission(relativePath, (char *)usr.c_str(),group
@@ -130,7 +130,7 @@ int main(int argc, const char * argv[])
 
 		string fileNameRelative("");
 
-		fileNameRelative.append("filesystem/");
+		fileNameRelative.append("/home/encryption/filesystem/");
 
 		if (containBit)
 
@@ -172,11 +172,22 @@ int main(int argc, const char * argv[])
 		unsigned char *real_key = (unsigned char *)malloc(33);
 		memset(real_key,0,33);
 	
-      		int encrypt_len = decrypt(key_enc_file, passwd_enc_length, fake_digest, iv2_enc,real_key);
+
+		cout <<"the iv2 for objget is  the following ---------------------------------->"<<endl;
+		hex_print(iv2_enc,16);
+		cout <<"the iv2 for objget is  the above ---------------------------------->"<<endl;
+	
+
+		cout <<"the iv1 for objget is  the following ---------------------------------->"<<endl;
+      		hex_print(iv1_enc,16);
+		cout <<"the iv1 for objget is  the above ---------------------------------->"<<endl;
+		int encrypt_len = decrypt(key_enc_file, passwd_enc_length, fake_digest, iv2_enc,real_key);
 		real_key  = (unsigned char *)realloc(real_key,encrypt_len+1);
 		real_key [encrypt_len] = '\0';
 		cout<<"-----------------------fake key      is aaaaaaaaaaaaaaaaaa!!!!!!!"<<endl;
 		hex_print(real_key, 16);
+
+		
 //		cout<<"the real value key is aaaaaaaaaaaaaaaa!!!!!!!!!"<<endl;
 //		hex_print(aes_Key, 16);
 
