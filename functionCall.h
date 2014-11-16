@@ -40,7 +40,7 @@ int writeIntoFile(string &);
 int size_of_file (string &);
 unsigned char * write_Into_file_and_out (string &,int &);
 void write_Into_file_cipher(string &, unsigned char *, int);
-int  encrypt_random_key(unsigned char *, unsigned char *, unsigned char *, unsigned char *);
+int  encrypt_random_key(unsigned char *,unsigned char *, unsigned char *, unsigned char *, unsigned char *);
 void hex_print(const void* , size_t);
 int encrypt(unsigned char *, int, unsigned char *,
   unsigned char *, unsigned char *);

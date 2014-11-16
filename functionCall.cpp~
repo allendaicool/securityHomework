@@ -615,11 +615,13 @@ int writeIntoFile(string &relativePath)
 }
 
 
-int  encrypt_random_key(unsigned char *iv, unsigned char *hashValue, unsigned char *random_key, unsigned char *encypted_key)
+int  encrypt_random_key(unsigned char *iv, unsigned char *iv2,unsigned char *hashValue, unsigned char *random_key, unsigned char *encypted_key)
 {
-	//unsigned char *iv =  (unsigned char *)malloc(AES_BLOCK_SIZE+1);
 	memset(iv,0,AES_BLOCK_SIZE+1);
 	rand_gen(iv);
+	memcpy(iv2, iv, AES_BLOCK_SIZE);
+	cout<<"------------------->   strlen of iv2 is "<< strlen((const char *)iv2) << endl;
+	cout<<"------------------->   strlen of iv is "<< strlen((const char *)iv) << endl;
 	int random_key_length = 16;
 	// assume encypted_key has been malloced
 	int cipher_text_length =  encrypt(random_key, random_key_length, hashValue,
@@ -643,7 +645,6 @@ void rand_gen (unsigned char *bytes)
 				"reading failure\n");
 				exit(1);
      		}
-
       		i++;
 	}
 //	printf("the size of byte is %d\n", sizeof(bytes[0]));

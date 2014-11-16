@@ -188,12 +188,16 @@ int main(int argc, const char * argv[])
 	
 	/* read file contents from the input file into the usr file
 	 */
-	unsigned char iv_enc[AES_BLOCK_SIZE], iv_dec[AES_BLOCK_SIZE];;
+	unsigned char * iv_enc =  (unsigned char *) malloc(AES_BLOCK_SIZE+1);
+	unsigned char * iv_dec = (unsigned char *) malloc(AES_BLOCK_SIZE+1);
  	unsigned char aes_Key[16];
 	memset(aes_Key, 0, 16);
+	memset(iv_enc,0,17);
+	memset(iv_decc,0,17);
 	rand_gen(aes_Key);
 	rand_gen(iv_enc);
 	memcpy(iv_dec, iv_enc, AES_BLOCK_SIZE);
+	cout<<"iv_dec lenght is  " << strlen((const char *)iv_dec)<<endl;
 	size_t cipher_length = 0;
 
 
@@ -267,6 +271,22 @@ int main(int argc, const char * argv[])
 
 	store_encryptedkey_iv_iv(MD5digest,iv_dec ,aes_Key , relativePath);
 
+	string fake_input("mima");
+	unsigned char *fake_digest = MD5Sequence(fake_input);
+	string viDec(relativePath);
+	viDec.append("+v2");
+	int v2_file_size = size_of_file (viDec);
+	FILE * v2_file;
+	v2_file = fopen(viDec.c_str(),"rb");
+	if (v2_file==NULL) {fputs ("File error",stderr); exit (1);}
+	unsigned char *v1_enc_buffer = (unsigned char *) malloc (sizeof(char)*v2_file_size);
+	int byte_read = fread (v1_enc_buffer,1,v2_file_size,v2_file);
+	if (v2_file_size != byte_read) {fputs ("Reading error",stderr); exit (3);}
+	cout<<"iv2_size is "<<	byte_read<<endl;
+
+
+
+
 
 	FILE * pFile;
  	long lSize;
@@ -294,18 +314,8 @@ int main(int argc, const char * argv[])
 
   // terminate
  	 fclose (pFile);
- 	// free (buffer);
+
 	 cout<<"it is ok here A"<<endl;
-/*	
-	while(getline(cin,bufferLine)){
-		if(flag !=0){
-		 	newFile<<"\n";
-		}
-		flag = 1;
-		newFile<<bufferLine;
-	}
-	newFile.close();
-*/
 
 	
 	unsigned char *plaintext2 = (unsigned char*)malloc(sizeof(char)*result+1);
@@ -320,40 +330,62 @@ int main(int argc, const char * argv[])
 
 	printf("our text file is %s \n", plaintext2);
 	cout <<"successful"<<endl;
-	
 	return 0;
-
 }
 
 
 void store_encryptedkey_iv_iv(unsigned char *MD5digest, unsigned char *iv_dec, unsigned char *aes_Key, string relativePath)
 {
+
 	string Key_path(relativePath);
 	Key_path.append("+key");
+	string v1_path(relativePath);
+	v1_path.append("+v1");
+	string v2_path(relativePath);
+	v2_path.append("+v2");
+	cout<<"AES_BLOCK_SIZE is " << AES_BLOCK_SIZE<<endl; 
 	unsigned char *iv = (unsigned char *)malloc(AES_BLOCK_SIZE+1);
 	unsigned char *iv_2 = (unsigned char *)malloc(AES_BLOCK_SIZE+1);
-	memcpy(iv_2, iv, AES_BLOCK_SIZE);
 	memset(iv,0,AES_BLOCK_SIZE+1);	
+	memset(iv_2,0,AES_BLOCK_SIZE+1);	
+
 	int encrypted_key_length = ((16 + AES_BLOCK_SIZE) /AES_BLOCK_SIZE) * AES_BLOCK_SIZE;
+
 	unsigned char *encypted_key = (unsigned char *)malloc(encrypted_key_length);
-        int encrypt_length = encrypt_random_key(iv, MD5digest, aes_Key,encypted_key);
+
+        int encrypt_length = encrypt_random_key(iv,iv_2, MD5digest, aes_Key,encypted_key);
+	
 
 	cout<<"encrypt_length is " << encrypt_length <<endl;
-	hex_print(encypted_key,encrypt_length);   
-
+	cout<<"-----------------string length is   " << strlen((const char*)iv_2)<<endl;
 	FILE *keyList;
 	keyList = fopen(Key_path.c_str(),"w+");
-	if(keyList == NULL)
+	if (keyList == NULL)
 		exit(EXIT_FAILURE);
 	fputs((const char *)encypted_key,keyList);
-	hex_print(encypted_key, encrypt_length);
-	fputs("\n",keyList);
-	fputs((const char *)iv_dec, keyList);
-	hex_print(iv_dec, 16);
-	fputs("\n", keyList);
-	fputs((const char *)iv_2, keyList);
-	hex_print(iv_2, 16);
+	//hex_print(encypted_key, encrypt_length);
 	fclose(keyList);
+	
+	FILE *v1List;
+	v1List = fopen(v1_path.c_str(),"w+");
+	if(keyList == NULL)
+		exit(EXIT_FAILURE);
+	fputs((const char *)iv_dec, v1List);
+	cout<<"iv_dec begining-------------------------------"<<endl;
+
+
+	//hex_print(iv_dec, 16);
+	cout<<"iv_dec ending-------------------------------"<<endl;
+	fclose(v1List);
+
+	FILE *v2List;
+	v2List = fopen(v2_path.c_str(),"w+");
+	if(keyList == NULL)
+		exit(EXIT_FAILURE);
+	fputs((const char *)iv_2, v2List);
+	//hex_print(iv_2, 16);
+	fclose(v2List);
+
 	free(iv);free(iv_2);free(encypted_key);
 }
 
